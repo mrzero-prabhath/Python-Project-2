@@ -82,15 +82,16 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
-            self.speed_x = 8
+            self.speed_x = -8  # Move left
         if keystate[pygame.K_RIGHT]:
-            self.speed_x = -8
+            self.speed_x = 8   # Move right
 
         self.rect.x += self.speed_x
-        if self.rect.right > SCREEN_WIDTH + 20:
-            self.rect.right = SCREEN_WIDTH + 20
-        if self.rect.left < -20:
-            self.rect.left = -20
+        # Keep player within screen bounds
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > SCREEN_WIDTH:
+            self.rect.right = SCREEN_WIDTH
 
     def shoot(self):
         if not self.hidden:
@@ -293,15 +294,15 @@ def main_game():
             all_sprites.add(new_enemy)
             enemies.add(new_enemy)
             if player.shield <= 0:
-                # player.lives -= 1
+                player.lives -= 1  # Decrement lives
                 player.shield = 100
                 player.hide()
-                if player.lives == 0:
+                if player.lives <= 0:
                     game_over = True
         
         # Check player-powerup collisions
         hits = pygame.sprite.spritecollide(player, powerups, True)
-        for hit in hits:
+        foroporto hit in hits:
             if hit.type == 'shield':
                 player.shield += 20
                 if player.shield > 100:
@@ -310,7 +311,7 @@ def main_game():
                 player.powerup()
         
         if game_over:
-            pass
+            running = False
             
         # Draw / render
         screen.fill(BLACK)
